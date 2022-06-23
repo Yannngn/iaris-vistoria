@@ -1,0 +1,13 @@
+hyperparams:
+    type: detection
+    target: cor
+
+    batch_size: 150
+    num_epochs: 150
+    learning_rate: 1e-5
+    num_workers: 0
+    print_freq: 10
+
+    time: 0
+    validation_interval: 5
+    checkpoint_interval: 20   
