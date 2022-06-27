@@ -6,7 +6,6 @@ from datetime import datetime
 from scripts.engine import train_one_epoch, evaluate
 
 from dataset import get_data
-from detector import comet_train_loop, train_loop
 from utils import get_model_instance_detection
 
 def train_detector(images, masks, hyperparams, comet=True):
@@ -45,9 +44,9 @@ def train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, d
         if epoch % hyperparams['checkpoint_interval'] == 0:
             torch.save(model.state_dict(), f'/models/{hyperparams["time"]}_{hyperparams["target"]}.pickle')
 
-def comet_train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, device, cometparams, hyperparams):
+def comet_train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams):
     comet_ml.init()
-    experiment = comet_ml.Experiment(api_key=cometparams['api_key'], project_name=cometparams['project_name'])
+    experiment = comet_ml.Experiment(api_key=hyperparams['comet_api_key'], project_name=hyperparams['comet_project_name'])
     experiment.log_parameters(hyperparams)
     
     for epoch in range(hyperparams['num_epochs']):
@@ -55,9 +54,8 @@ def comet_train_loop(model, optimizer, scheduler, dataloader_train, dataloader_t
             metric_logger = train(model, optimizer, scheduler, dataloader_train, device, epoch, hyperparams)
             print(metric_logger)
         
-        if epoch % hyperparams['validation_interval'] == 0:
-            with experiment.validate():
-                validate(model, dataloader_test, device)
+        with experiment.validate():
+            validate(model, dataloader_test, device)
                 
         if epoch % hyperparams['checkpoint_interval'] == 0:
             torch.save(model.state_dict(), f'/models/{hyperparams["time"]}_{hyperparams["target"]}.pickle')

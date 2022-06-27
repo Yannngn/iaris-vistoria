@@ -1,0 +1,23 @@
+type: classification
+target: cor
+device: gpu
+num_classes: 11
+labels: ['azul', 'bege', 'branco', 'cinza', 'laranja', 'marrom', 'prata', 'preto', 'verde', 'vermelho', 'vinho']
+weighted: False
+
+optimizer: sgd
+criterion: crossentropy
+scheduler: step
+
+batch_size: 200
+num_epochs: 15
+learning_rate: .0001
+num_workers: 0
+
+image_size: 512
+layer_2_size: 4096
+layer_4_size: 1024
+
+time: 0
+validation_interval: 1
+checkpoint_interval: 20   
