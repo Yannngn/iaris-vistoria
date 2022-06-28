@@ -1,5 +1,6 @@
 import comet_ml
 import numpy as np
+import os
 import torch
 
 from tqdm import tqdm
@@ -83,7 +84,7 @@ def comet_train_loop(model, loss_criterion, optimizer, scheduler, dataloader_tra
         print(f'VALIDATION: \t Loss: {val_loss}; Accuracy: {val_accuracy}')            
         
         if epoch % hyperparams['checkpoint_interval'] == 0 or epoch == hyperparams['num_epochs'] - 1:
-            torch.save(model.state_dict(), f'models/{hyperparams["time"]}_{hyperparams["target"]}.pickle')
+            torch.save(model.state_dict(), os.path.join(os.path.dirname(os.path.abspath(__file__)), f'models/{hyperparams["time"]}_{hyperparams["target"]}.pickle'))
             
 #        experiment.log_epoch_end(epoch)   
         
