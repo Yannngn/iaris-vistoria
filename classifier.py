@@ -105,7 +105,7 @@ def train(model, loss_criterion, optimizer, dataloader, device, epoch):
         
         _, predicted = torch.max(outputs.data, 1)
         batch_total = labels.size(0)
-        batch_correct = (predicted == labels.data).sum()
+        batch_correct = (predicted == labels.data).cpu().sum().numpy()
         batch_accuracy.append(batch_correct / batch_total)
                         
         batch_loss.append(loss.item())
@@ -130,7 +130,7 @@ def validate(model, loss_criterion, scheduler, dataloader, device):
 
             _, predicted = torch.max(outputs.data, 1)
             batch_total = labels.size(0)
-            batch_correct = (predicted == labels.data).sum()
+            batch_correct = (predicted == labels.data).cpu().sum().numpy()
             batch_accuracy.append(batch_correct / batch_total)
                             
             batch_loss.append(loss.item())
@@ -156,7 +156,7 @@ def expensive_validate(model, loss_criterion, scheduler, dataloader, global_metr
 
             _, predicted = torch.max(outputs.data, 1)
             batch_total = labels.size(0)
-            batch_correct = (predicted == labels.data).sum()
+            batch_correct = (predicted == labels.data).cpu().sum().numpy()
             batch_accuracy.append(batch_correct / batch_total)
                             
             batch_loss.append(loss.item())
