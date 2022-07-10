@@ -1,32 +1,96 @@
-from typing import Tuple, Union
+
 import numpy as np
+import os
 import pandas as pd
+import shutil
 import torch
+import torchvision
 
 from PIL import Image
+from typing import Optional, Tuple, Union
 
 from scripts import utils as SU
 
-def get_images_and_labels_from_df(df: Union[pd.DataFrame, str], image_column: str, label_column: str, uniques: list) -> Tuple[list, list]:
-    if type(df) is str:
-        df = pd.read_csv(df)    
+def get_images_and_labels_from_df(
+        input: str, 
+        output: Optional[str], 
+        params: dict,
+        copy_files: bool = False) -> Tuple[list, list]:
+
+    ''' Returns images and labels paths, if copy_files is True it copies the files from the original location to the output
+        Args:
+            :param str input: path to input csv
+            :param str output: new path for copying the images
+            :param dict params: parameters dictionary with "type", "image_column" and "target", "classification"/"detection", column that contains the images path and column that contains the labels/masks
+            :param bool copy_files: copy files to output if provided
+        Returns: 
+            :return: images and labels, lists with the paths
+    '''
     
-    labels = df[label_column].values.tolist()
-    #if type(labels[0]) is not str:
-    for i, v in enumerate(uniques):
-        labels = [l if l != v else i for l in labels]
+    df = pd.read_csv(input)    
+    images = df[params['image_column']].values.tolist()
+    if output:
+        temp = os.path.dirname(images[-1])
+        images = [img.replace(temp, os.path.join(output, 'images')) for img in images]
+        if copy_files: get_images_from_drive(temp, os.path.join(output, 'images'))
+    
+    labels = df[params['target']].values.tolist()
+    if params['type'] == 'classification':
+        for i, v in enumerate(params['labels']):
+            labels = [l if l != v else i for l in labels]
+    elif params['type'] == 'detection':
+        if output:
+            temp = os.path.dirname(labels[-1])
+            labels = [lab.replace(temp, os.path.join(output, 'masks')) for lab in labels]
+            if copy_files: get_images_from_drive(temp, os.path.join(output, 'masks'))
 
-    #print(uniques)
-    return df[image_column].values.tolist(), labels
+    return images, labels
 
-def get_data(images, masks, train_transform, test_transform, hyperparams):   
+def get_images_from_drive(
+        input: str, 
+        output: str) -> None:
+
+    '''Copies files from input directory to output directory
+    
+    Args:
+        :param str input: input directory
+        :param str output: output directory
+    
+    '''
+    files = os.listdir(input)
+    for name in files:
+        full_name = os.path.join(input, name)
+        if not os.path.isfile(full_name): continue       
+        shutil.copy(full_name, output)
+
+def get_data(
+        images: list, 
+        labels: list, 
+        train_transform: torchvision.transforms, 
+        test_transform: torchvision.transforms, 
+        hyperparams: dict) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
+    
+    '''Returns train and test dataloaders, providing images, labels/masks, transforms and parameters\n
+
+    Args:
+        images (list): images list
+        labels (list): labels list, mask paths or label integers
+        train_transform (torchvision.transforms): transforms
+        test_transform (torchvision.transforms): transforms
+        hyperparams (dict): parameters dict
+
+    Returns:
+        Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]: train and test dataloaders.
+    
+    '''
+    
     if hyperparams['type'] == 'detection':
-        dataset = DetectionDataset(images, masks, train_transform)
-        dataset_test = DetectionDataset(images, masks, test_transform)
+        dataset = DetectionDataset(images, labels, train_transform)
+        dataset_test = DetectionDataset(images, labels, test_transform)
     
     elif hyperparams['type'] == 'classification':
-        dataset = ClassificationDataset(images, masks, train_transform)
-        dataset_test = ClassificationDataset(images, masks, test_transform)
+        dataset = ClassificationDataset(images, labels, train_transform)
+        dataset_test = ClassificationDataset(images, labels, test_transform)
 
     indices = torch.randperm(len(dataset)).tolist()
     length = int(.7 * len(dataset))
@@ -42,6 +106,7 @@ def get_data(images, masks, train_transform, test_transform, hyperparams):
         test = torch.utils.data.DataLoader(dataset_test, batch_size=hyperparams['batch_size'], 
                                             shuffle=False, num_workers=0, 
                                             collate_fn=SU.collate_fn)
+        
     elif hyperparams['type'] == 'classification':      
         train = torch.utils.data.DataLoader(dataset, batch_size=hyperparams['batch_size'], 
                                             shuffle=True, num_workers=0)

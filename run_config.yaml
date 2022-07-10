@@ -1,0 +1,4 @@
+api_key: 7UnASfYEEYgTW4nxdFN6dDhV4
+model: detection
+target: farol
+data: dataset_itens_obrigatorios.csv

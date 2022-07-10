@@ -2,14 +2,30 @@ import comet_ml
 import numpy as np
 import os
 import torch
+import torchvision
 
 from tqdm import tqdm
+from typing import Optional, Tuple
 
 from dataset import get_data
 from utils import get_model_instance_classification, get_criterion, get_optimizer, get_scheduler, get_metrics
 from metrics import evaluate_classification
 
-def train_classifier(images, masks, hyperparams, comet=True):
+def train_classifier(
+        images: list, 
+        masks: list, 
+        hyperparams: dict, 
+        comet: bool = True) -> None:
+    
+    """_summary_
+
+    Args:
+        images (list): _description_
+        masks (list): _description_
+        hyperparams (dict): _description_
+        comet (bool, optional): _description_. Defaults to True.
+    """    
+    
     device = torch.device('cpu')
     if hyperparams['device'] == 'gpu':
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -30,7 +46,29 @@ def train_classifier(images, masks, hyperparams, comet=True):
     
     torch.save(model.state_dict(), f'models/{hyperparams["time"]}_{hyperparams["target"]}.pickle')
 
-def train_loop(model, loss_criterion, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams):
+def train_loop(
+        model, 
+        loss_criterion, 
+        optimizer, 
+        scheduler, 
+        dataloader_train, 
+        dataloader_test, 
+        device, 
+        hyperparams: dict):
+    
+    """ Runs training loop for N epochs
+    
+    Args:
+        model (torch.module model): Model to be trained
+        loss_criterion (torch.nn loss function): Loss function 
+        optimizer: (torch.optim optimizer): Optimizer  
+        scheduler: (torch.optim.LR_Scheduler): Learning Rate Scheduler  
+        dataloader_train: (torch.utils.data.DataLoader): Train dataloader
+        dataloader_test: (torch.utils.data.DataLoader): Test dataloader
+        device: (torch.device): device
+        hyperparams (dict): parameters dict
+    """    
+    
     for epoch in range(hyperparams['num_epochs']):
         print(f'Starting training epoch {epoch}:')
         
@@ -44,7 +82,29 @@ def train_loop(model, loss_criterion, optimizer, scheduler, dataloader_train, da
         
         print(f'Loss: {val_loss}; Accuracy: {val_accuracy}')
 
-def comet_train_loop(model, loss_criterion, optimizer, scheduler, dataloader_train, dataloader_val, device, hyperparams):
+def comet_train_loop(
+        model, 
+        loss_criterion, 
+        optimizer, 
+        scheduler, 
+        dataloader_train, 
+        dataloader_val, 
+        device, 
+        hyperparams: dict):
+    
+    """ Runs training loop for N epochs while logging to comet_ml
+    
+    Args:
+        model (torch.module model): Model to be trained
+        loss_criterion (torch.nn loss function): Loss function 
+        optimizer: (torch.optim optimizer): Optimizer  
+        scheduler: (torch.optim.LR_Scheduler): Learning Rate Scheduler  
+        dataloader_train: (torch.utils.data.DataLoader): Train dataloader
+        dataloader_test: (torch.utils.data.DataLoader): Test dataloader
+        device: (torch.device): device
+        hyperparams (dict): parameters dict
+    """   
+
     comet_ml.init(api_key=hyperparams['comet_api_key'])
     experiment = comet_ml.Experiment(api_key=hyperparams['comet_api_key'], project_name=hyperparams['comet_project_name'])
     experiment.log_parameters(hyperparams)   
@@ -86,9 +146,15 @@ def comet_train_loop(model, loss_criterion, optimizer, scheduler, dataloader_tra
         if epoch % hyperparams['checkpoint_interval'] == 0 or epoch == hyperparams['num_epochs'] - 1:
             torch.save(model.state_dict(), os.path.join(os.path.dirname(os.path.abspath(__file__)), f'models/{hyperparams["time"]}_{hyperparams["target"]}.pickle'))
             
-#        experiment.log_epoch_end(epoch)   
+        experiment.log_epoch_end(epoch)   
         
-def train(model, loss_criterion, optimizer, dataloader, device, epoch):
+def train(
+        model, 
+        loss_criterion, 
+        optimizer, 
+        dataloader, 
+        device) -> Tuple[float, float]:
+    
     batch_accuracy, batch_loss = [], []
     model.train()
     loader = tqdm(dataloader)

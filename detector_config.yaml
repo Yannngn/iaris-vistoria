@@ -1,12 +1,20 @@
 type: detection
-target: cor
+image_column: original_image
+target: farol
+device: gpu
+weighted: False
+
+optimizer: sgd
+criterion: crossentropy
+scheduler: step
+scheduler_step: 5
 
 batch_size: 150
 num_epochs: 150
-learning_rate: 1e-5
+learning_rate: .0001
 num_workers: 0
-print_freq: 10
 
 time: 0
-validation_interval: 5
+print_freq: 10
+validation_interval: 1
 checkpoint_interval: 20   

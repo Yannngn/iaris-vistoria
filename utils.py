@@ -22,9 +22,11 @@ def get_criterion(hyperparams):
     else: pass
 
 def get_scheduler(optimizer, hyperparams):
-    assert hyperparams['scheduler'] in ['step', None], f'{hyperparams["scheduler"]} not recognized'
+    assert hyperparams['scheduler'] in ['step', 'plateau', 'cyclic', None], f'{hyperparams["scheduler"]} not recognized'
 
-    if hyperparams['scheduler'] == 'step': return torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+    if hyperparams['scheduler'] == 'step': return torch.optim.lr_scheduler.StepLR(optimizer, step_size=hyperparams['scheduler_step'], gamma=0.1)
+    elif hyperparams['scheduler'] == 'plateau': return torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', step_size=hyperparams['scheduler_step'])
+    elif hyperparams['scheduler'] == 'cyclic': return torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=hyperparams['learning_rate'] * 0.1, max_lr=hyperparams['learning_rate'], step_size_up=hyperparams['scheduler_step'], verbose=True)
     else: pass
     
 def get_model_instance_classification(hyperparams):

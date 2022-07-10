@@ -1,13 +1,15 @@
 type: classification
+image_column: original_image
 target: cor
 device: gpu
 num_classes: 11
-labels: ['azul', 'bege', 'branco', 'cinza', 'laranja', 'marrom', 'prata', 'preto', 'verde', 'vermelho', 'vinho']
+#labels: [azul, bege, branco, cinza, laranja, marrom, prata, preto, verde, vermelho, vinho]
 weighted: False
 
 optimizer: sgd
 criterion: crossentropy
 scheduler: step
+scheduler_step: 5
 
 batch_size: 200
 num_epochs: 15
