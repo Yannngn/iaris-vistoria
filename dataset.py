@@ -14,8 +14,8 @@ from scripts import utils as SU
 def get_images_and_labels_from_df(
         input: str, 
         output: Optional[str], 
-        params: dict,
-        copy_files: bool = False) -> Tuple[list, list]:
+        params: dict
+        )-> Tuple[list, list]:
 
     ''' Returns images and labels paths, if copy_files is True it copies the files from the original location to the output
         Args:
@@ -31,24 +31,31 @@ def get_images_and_labels_from_df(
     images = df[params['image_column']].values.tolist()
     if output:
         temp = os.path.dirname(images[-1])
-        images = [img.replace(temp, os.path.join(output, 'images')) for img in images]
-        if copy_files: get_images_from_drive(temp, os.path.join(output, 'images'))
+        images = [img.replace(temp, os.path.join(output, 'images')).replace('\\', '/') for img in images]
+        print(images[0])
     
-    labels = df[params['target']].values.tolist()
+    
     if params['type'] == 'classification':
+        labels = df[params['target']].values.tolist()
         for i, v in enumerate(params['labels']):
             labels = [l if l != v else i for l in labels]
+            (images, labels) = [(a, b) for a, b in zip(images, labels) if b]
     elif params['type'] == 'detection':
+        labels = df[f"{params['target']}_masks"].values.tolist()
         if output:
             temp = os.path.dirname(labels[-1])
-            labels = [lab.replace(temp, os.path.join(output, 'masks')) for lab in labels]
-            if copy_files: get_images_from_drive(temp, os.path.join(output, 'masks'))
+            labels = [lab.replace(temp, os.path.join(output, 'combined_masks')) if type(lab) is str else None for lab in labels]
+            ## Quase certeza que dá pra fazer isso numa unica comprehension, mas ValueError: too many values to unpack (expected 2)
+            tup = [(a,b) for a,b  in zip(images, labels) if b]
+            images = [a for a, _ in tup]
+            labels = [b for _, b in tup]
 
     return images, labels
 
 def get_images_from_drive(
         input: str, 
-        output: str) -> None:
+        output: str
+        ) -> None:
 
     '''Copies files from input directory to output directory
     
@@ -68,7 +75,8 @@ def get_data(
         labels: list, 
         train_transform: torchvision.transforms, 
         test_transform: torchvision.transforms, 
-        hyperparams: dict) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
+        hyperparams: dict
+        ) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     
     '''Returns train and test dataloaders, providing images, labels/masks, transforms and parameters\n
 

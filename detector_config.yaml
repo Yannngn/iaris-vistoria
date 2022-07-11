@@ -1,7 +1,8 @@
 type: detection
-image_column: original_image
+image_column: ref_image
 target: farol
 device: gpu
+num_classes: 2
 weighted: False
 
 optimizer: sgd
@@ -13,6 +14,7 @@ batch_size: 150
 num_epochs: 150
 learning_rate: .0001
 num_workers: 0
+hidden_layer: 256
 
 time: 0
 print_freq: 10

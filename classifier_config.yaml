@@ -1,5 +1,5 @@
 type: classification
-image_column: original_image
+image_column: ref_image
 target: cor
 device: gpu
 num_classes: 11
