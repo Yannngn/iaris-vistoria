@@ -26,10 +26,9 @@ if __name__ == '__main__':
         hyperparams['target'] = target
         hyperparams['time'] = now
     
-        images, masks = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), os.path.join(abs_path, r'data\obrigatorios'), hyperparams)
+        #images, masks = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), os.path.join(abs_path, r'data\obrigatorios'), hyperparams)
         
-        #images = [i.replace('/content/drive/MyDrive/IARIS/computer-vision-team/benchmark/resize_segmentador_obrigatorios/resize_original', os.path.join(abs_path,'obrigatorios/data/images')) for i in images]
-        #masks = [m.replace('/content/drive/MyDrive/IARIS/computer-vision-team/benchmark/resize_segmentador_obrigatorios/combined_masks', os.path.join(abs_path,'obrigatorios/data/masks')) for m in masks]
+        images, masks = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), None, hyperparams)
         
         for k, v in comet.items():
             hyperparams[f'comet_{k}'] = v
@@ -45,8 +44,8 @@ if __name__ == '__main__':
         for k, v in comet.items():
             hyperparams[f'comet_{k}'] = v
         
-        images, labels = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), os.path.join(abs_path, r'data\super'), hyperparams)
-        #images = [i.replace('/content/drive/MyDrive/IARIS/computer-vision-team/benchmark/resize_segmentador_obrigatorios/resize_original', os.path.join(abs_path,'super/data/images')) for i in images]
+        #images, labels = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), os.path.join(abs_path, r'data\super'), hyperparams)
+        images, labels = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), None, hyperparams)
         
         train_classifier(images, labels, hyperparams)
    
