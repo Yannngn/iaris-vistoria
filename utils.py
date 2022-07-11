@@ -38,7 +38,7 @@ def get_model_instance_classification(hyperparams):
     transform_train = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
                                                       torchvision.transforms.Resize((hyperparams['image_size'], hyperparams['image_size'])),
                                                       torchvision.transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),
-                                                      #torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
+                                                      # torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
                                                       torchvision.transforms.RandomHorizontalFlip(.5),
                                                       torchvision.transforms.RandomRotation(5)
                                                       ])

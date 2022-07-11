@@ -37,7 +37,8 @@ def get_images_and_labels_from_df(
              
     if params['type'] == 'classification':
         labels = df[params['target']].values.tolist()
-        params['labels'] = list(set(df[f'{params["target"]}_label'])) 
+        params['labels'] = list(set(df[f'{params["target"]}_label']))
+        params['num_classes'] = len(params['labels'])
         for i, v in enumerate(params['labels']):
             labels = [l if l != v else i for l in labels]
 
@@ -117,8 +118,8 @@ def get_data(
                                             collate_fn=SU.collate_fn)
 
         test = torch.utils.data.DataLoader(dataset_test, batch_size=hyperparams['batch_size'], 
-                                            shuffle=False, num_workers=0, 
-                                            collate_fn=SU.collate_fn)
+                                           shuffle=False, num_workers=0, 
+                                           collate_fn=SU.collate_fn)
         
     elif hyperparams['type'] == 'classification':      
         train = torch.utils.data.DataLoader(dataset, batch_size=hyperparams['batch_size'], 

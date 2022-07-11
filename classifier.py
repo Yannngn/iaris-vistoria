@@ -72,7 +72,7 @@ def train_loop(
     for epoch in range(hyperparams['num_epochs']):
         print(f'Starting training epoch {epoch}:')
         
-        train_loss, train_accuracy = train(model, loss_criterion, optimizer, dataloader_train, device, epoch)
+        train_loss, train_accuracy = train(model, loss_criterion, optimizer, dataloader_train, device)
         
         print(f'Loss: {train_loss}; Accuracy: {train_accuracy}')
         print()
@@ -116,7 +116,7 @@ def comet_train_loop(
         experiment.set_step(epoch)
         print(f'Starting training epoch {epoch}:') 
 
-        train_loss, train_accuracy = train(model, loss_criterion, optimizer, dataloader_train, device, epoch)
+        train_loss, train_accuracy = train(model, loss_criterion, optimizer, dataloader_train, device)
         with experiment.train():
             experiment.log_metrics({"accuracy": train_accuracy, "loss": train_loss})        
         print(f'TRAIN: \t Loss: {train_loss}; Accuracy: {train_accuracy}')
@@ -124,7 +124,7 @@ def comet_train_loop(
         
         if epoch % hyperparams['validation_interval'] == 0 or epoch == hyperparams['num_epochs'] - 1:
             print(f'Validating and logging epoch {epoch}:')
-            val_loss, val_accuracy, metrics = expensive_validate(model, loss_criterion, scheduler, dataloader_val, global_metrics, label_metrics, hyperparams, device, epoch)
+            val_loss, val_accuracy, metrics = expensive_validate(model, loss_criterion, scheduler, dataloader_val, global_metrics, label_metrics, hyperparams, device)
             
         else:
             print(f'Validating epoch {epoch}:')
@@ -206,7 +206,7 @@ def validate(model, loss_criterion, scheduler, dataloader, device):
           
     return epoch_loss, epoch_accuracy
 
-def expensive_validate(model, loss_criterion, scheduler, dataloader, global_metrics, label_metrics, hyperparams, device, epoch):
+def expensive_validate(model, loss_criterion, scheduler, dataloader, global_metrics, label_metrics, hyperparams, device):
     batch_accuracy, batch_loss = [], []
     loader = tqdm(dataloader)
     with torch.no_grad():

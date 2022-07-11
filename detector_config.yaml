@@ -7,11 +7,11 @@ weighted: False
 
 optimizer: sgd
 criterion: crossentropy
-scheduler: step
-scheduler_step: 5
+scheduler: cyclic
+scheduler_step: 15
 
 batch_size: 150
-num_epochs: 150
+num_epochs: 250
 learning_rate: .0001
 num_workers: 0
 hidden_layer: 256
