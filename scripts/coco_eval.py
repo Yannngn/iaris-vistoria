@@ -1,14 +1,14 @@
 import copy
 import io
-from contextlib import redirect_stdout
-
 import numpy as np
 import pycocotools.mask as mask_util
 import torch
-import utils
+
+from contextlib import redirect_stdout
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
+from scripts import utils
 
 class CocoEvaluator:
     def __init__(self, coco_gt, iou_types):

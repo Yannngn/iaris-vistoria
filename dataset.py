@@ -159,8 +159,10 @@ class DetectionDataset(Dataset):
         img_path = self.images[idx]
         mask_path = self.labels[idx]
         img = Image.open(img_path).convert("RGB")
+        #img = img.resize((320, 320))
 
         mask = Image.open(mask_path)
+        #img = img.resize((320, 320))
         mask = np.array(mask)
         
         obj_ids = np.unique(mask)

@@ -12,40 +12,31 @@ if __name__ == '__main__':
     abs_path = os.path.dirname(os.path.abspath(__file__))                                    
     now = datetime.now().strftime("%Y%m%d-%H%M%S")
     
-    with open(os.path.join(abs_path, 'run_config.yaml')) as f:
-        comet = yaml.safe_load(f)
-    
-    target = comet['target']
-    model = comet['model']
+    run_type = input('detect or classify')
 
-    comet['project_name'] = f"model_{comet['model']}_{comet['target']}"
-
-    if comet['model'] == 'detection':
+    if run_type == 'detection':
         with open(os.path.join(abs_path, 'detector_config.yaml')) as f:
             hyperparams = yaml.safe_load(f)
-        hyperparams['target'] = target
+            
+        hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
         hyperparams['time'] = now
     
         #images, masks = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), os.path.join(abs_path, r'data\obrigatorios'), hyperparams)
         
-        images, masks = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), None, hyperparams)
-        
-        for k, v in comet.items():
-            hyperparams[f'comet_{k}'] = v
+        images, masks = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['data']), None, hyperparams)
             
         train_detector(images, masks, hyperparams)
 
-    elif model == 'classification':
+    elif run_type == 'classification':
         with open('classifier_config.yaml') as f:
             hyperparams = yaml.safe_load(f)
-        hyperparams['target'] = target
+            
+        hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
         hyperparams['time'] = now
-        
-        for k, v in comet.items():
-            hyperparams[f'comet_{k}'] = v
+
         
         #images, labels = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), os.path.join(abs_path, r'data\super'), hyperparams)
-        images, labels = get_images_and_labels_from_df(os.path.join(abs_path, comet['data']), None, hyperparams)
+        images, labels = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['data']), None, hyperparams)
         
         train_classifier(images, labels, hyperparams)
    

@@ -1,16 +1,21 @@
+use_comet: False
+api_key: 7UnASfYEEYgTW4nxdFN6dDhV4
 type: detection
+device: gpu
+
+data: dataset_itens_obrigatorios.csv
 image_column: ref_image
 target: farol
-device: gpu
+image_size: 320
 num_classes: 2
-weighted: False
 
+weighted: False
 optimizer: sgd
 criterion: crossentropy
 scheduler: cyclic
 scheduler_step: 15
 
-batch_size: 150
+batch_size: 15
 num_epochs: 250
 learning_rate: .0001
 num_workers: 0

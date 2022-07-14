@@ -6,7 +6,7 @@ from datetime import datetime
 from scripts.engine import train_one_epoch, evaluate
 
 from dataset import get_data
-from utils import get_model_instance_detection
+from utils import get_model_instance_detection, get_optimizer, get_scheduler
 
 def train_detector(images, masks, hyperparams, comet=True):
     device = torch.device('cpu')
@@ -19,14 +19,14 @@ def train_detector(images, masks, hyperparams, comet=True):
     dataloader_train, dataloader_test = get_data(images, masks, train_transform, test_transform, hyperparams)
     
     params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.SGD(params, lr=hyperparams['learning_rate'], momentum=0.9, weight_decay=0.0005)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+    optimizer = get_optimizer(params, hyperparams)
+    scheduler = get_scheduler(optimizer, hyperparams)
     now = datetime.now().strftime("%Y%m%d-%H%M%S")
     hyperparams['time'] = now
     
     if 'print_freq' not in hyperparams: hyperparams['print_freq'] = 10
     
-    if comet:
+    if hyperparams['use_comet']:
         comet_train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams)
     else:
         train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams)
@@ -35,7 +35,7 @@ def train_detector(images, masks, hyperparams, comet=True):
     
 def train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams):
     for epoch in range(hyperparams['num_epochs']):
-        metric_logger = train(model, optimizer, scheduler, dataloader_train, device, epoch)
+        metric_logger = train(model, optimizer, scheduler, dataloader_train, device, epoch, hyperparams)
         print(metric_logger)
         
         if epoch % hyperparams['validation_interval'] == 0:

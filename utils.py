@@ -54,6 +54,7 @@ def get_model_instance_detection(hyperparams):
     def get_detection_transform(train):
         transforms = []
         transforms.append(T.PILToTensor())
+        transforms.append(T.Resize((hyperparams['image_size'], hyperparams['image_size'])))
         transforms.append(T.ConvertImageDtype(torch.float32))
         
         if train:

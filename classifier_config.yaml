@@ -1,9 +1,14 @@
+use_comet: False
+api_key: 7UnASfYEEYgTW4nxdFN6dDhV4
 type: classification
+device: gpu
+
+data: dataset_super_veiculos.csv
 image_column: ref_image
 target: cor
-device: gpu
-weighted: False
+image_size: 512
 
+weighted: False
 optimizer: sgd
 criterion: crossentropy
 scheduler: cyclic
@@ -14,7 +19,6 @@ num_epochs: 250
 learning_rate: .0001
 num_workers: 0
 
-image_size: 512
 layer_2_size: 4096
 layer_4_size: 1024
 
