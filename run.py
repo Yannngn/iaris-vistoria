@@ -2,6 +2,7 @@ import os
 import yaml
 
 from datetime import datetime
+from argparse import ArgumentParser
 
 from dataset import get_images_and_labels_from_df
 from detector import train_detector
@@ -12,7 +13,7 @@ if __name__ == '__main__':
     abs_path = os.path.dirname(os.path.abspath(__file__))                                    
     now = datetime.now().strftime("%Y%m%d-%H%M%S")
     
-    run_type = input('detect or classify')
+    run_type = input('detection or classification')
 
     if run_type == 'detection':
         with open(os.path.join(abs_path, 'detector_config.yaml')) as f:
@@ -39,4 +40,12 @@ if __name__ == '__main__':
         images, labels = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['data']), None, hyperparams)
         
         train_classifier(images, labels, hyperparams)
-   
+
+class Args:  
+    @staticmethod
+    def add_args(parent_parser: ArgumentParser) -> None:
+        parser = ArgumentParser(parents=[parent_parser])
+
+        parser.add_argument('--model', '-m', type=str, help="detection or classification")
+        
+        return parser

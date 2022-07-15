@@ -30,21 +30,20 @@ class Resize(T.Resize):
     def forward(
         self, image: Tensor, target: Optional[Dict[str, Tensor]] = None
     ) -> Tuple[Tensor, Optional[Dict[str, Tensor]]]:
-        image = F.resize(image, [self.width, self.height])
-        if target is not None:
-            width, height = F.get_image_size(image)
-            for i, box in enumerate(target['boxes']):
-                target['boxes'][i, 0] = int(box[0] * self.width / width)
-                target['boxes'][i, 1] =  int(box[1] * self.height / height)
-                target['boxes'][i, 2] =  int(box[2] * self.width / width)
-                target['boxes'][i, 3] =  int(box[3] * self.height / height)
-
-            if "masks" in target:
-                for i, mask in enumerate(target["masks"]):
-                    target["masks"][i] = F.resize(mask, [self.width, self.height])
-            
-            target['area'] = (target['boxes'][:, 3] - target['boxes'][:, 1]) * (target['boxes'][:, 2] - target['boxes'][:, 0])
+        width, height = F.get_image_size(image)
+        image = F.resize(image, self.size)
         
+        if target is not None:
+            for i, box in enumerate(target['boxes']):
+                target['boxes'][i, 0] = int(box[0] * self.size[0] / width)
+                target['boxes'][i, 1] =  int(box[1] * self.size[1] / height)
+                target['boxes'][i, 2] =  int(box[2] * self.size[0] / width)
+                target['boxes'][i, 3] =  int(box[3] * self.size[1] / height)
+
+            target["masks"] = F.resize(target["masks"].unsqueeze(1), self.size).squeeze()
+
+            target['area'] = (target['boxes'][:, 3] - target['boxes'][:, 1]) * (target['boxes'][:, 2] - target['boxes'][:, 0])
+
         return image, target
 class RandomHorizontalFlip(T.RandomHorizontalFlip):
     def forward(

@@ -50,9 +50,9 @@ def get_images_and_labels_from_df(
         labels = df[f"{params['target']}_masks"].values.tolist()
         if output:
             temp = os.path.dirname(labels[-1])
-            labels = [lab.replace(temp, os.path.join(output, 'combined_masks')) if type(lab) is str else None for lab in labels]
+            labels = [lab.replace(temp, os.path.join(output, 'combined_masks')) if type(lab) is str else np.nan for lab in labels]
         ## Quase certeza que dá pra fazer isso numa unica comprehension, mas ValueError: too many values to unpack (expected 2)
-        tup = [(a,b) for a,b  in zip(images, labels) if b]
+        tup = [(a,b) for a,b  in zip(images, labels) if b is str]
         images = [a for a, _ in tup]
         labels = [b for _, b in tup]
 
