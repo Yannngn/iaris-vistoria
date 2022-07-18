@@ -52,7 +52,7 @@ def get_images_and_labels_from_df(
             temp = os.path.dirname(labels[-1])
             labels = [lab.replace(temp, os.path.join(output, 'combined_masks')) if type(lab) is str else np.nan for lab in labels]
         ## Quase certeza que dá pra fazer isso numa unica comprehension, mas ValueError: too many values to unpack (expected 2)
-        tup = [(a,b) for a,b  in zip(images, labels) if b is str]
+        tup = [(a,b) for a,b  in zip(images, labels) if type(b) is str]
         images = [a for a, _ in tup]
         labels = [b for _, b in tup]
 
@@ -159,10 +159,10 @@ class DetectionDataset(Dataset):
         img_path = self.images[idx]
         mask_path = self.labels[idx]
         img = Image.open(img_path).convert("RGB")
-        #img = img.resize((320, 320))
+        img = img.resize((320, 320))
 
-        mask = Image.open(mask_path)
-        #img = img.resize((320, 320))
+        mask = Image.open(mask_path).convert("L")
+        mask = mask.resize((320, 320))
         mask = np.array(mask)
         
         obj_ids = np.unique(mask)
