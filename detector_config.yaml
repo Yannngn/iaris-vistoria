@@ -1,6 +1,6 @@
 use_comet: False
 api_key: 7UnASfYEEYgTW4nxdFN6dDhV4
-type: detection
+model: detection
 device: gpu
 
 data: dataset_itens_obrigatorios.csv

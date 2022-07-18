@@ -21,7 +21,7 @@ def get_images_and_labels_from_df(
         Args:
             :param str input: path to input csv
             :param str output: new path for copying the images
-            :param dict params: parameters dictionary with "type", "image_column" and "target", "classification"/"detection", column that contains the images path and column that contains the labels/masks
+            :param dict params: parameters dictionary with "model" - "classification"/"detection", "image_column" - column that contains the images path and "target" - column that contains the labels/masks
             :param bool copy_files: copy files to output if provided
         Returns: 
             :return: images and labels, lists with the paths
@@ -35,7 +35,7 @@ def get_images_and_labels_from_df(
         print(images[0])
 
              
-    if params['type'] == 'classification':
+    if params['model'] == 'classification':
         labels = df[params['target']].values.tolist()
         params['labels'] = list(set(df[f'{params["target"]}_label']))
         params['num_classes'] = len(params['labels'])
@@ -46,7 +46,7 @@ def get_images_and_labels_from_df(
             images = [a for a, _ in tup]
             labels = [b for _, b in tup]
 
-    elif params['type'] == 'detection':
+    elif params['model'] == 'detection':
         labels = df[f"{params['target']}_masks"].values.tolist()
         if output:
             temp = os.path.dirname(labels[-1])
@@ -98,11 +98,11 @@ def get_data(
     
     '''
     
-    if hyperparams['type'] == 'detection':
+    if hyperparams['model'] == 'detection':
         dataset = DetectionDataset(images, labels, train_transform)
         dataset_test = DetectionDataset(images, labels, test_transform)
     
-    elif hyperparams['type'] == 'classification':
+    elif hyperparams['model'] == 'classification':
         dataset = ClassificationDataset(images, labels, train_transform)
         dataset_test = ClassificationDataset(images, labels, test_transform)
 
@@ -112,7 +112,7 @@ def get_data(
     dataset = torch.utils.data.Subset(dataset, indices[:length])
     dataset_test = torch.utils.data.Subset(dataset_test, indices[length:])
     
-    if hyperparams['type'] == 'detection':
+    if hyperparams['model'] == 'detection':
         train = torch.utils.data.DataLoader(dataset, batch_size=hyperparams['batch_size'], 
                                             shuffle=True, num_workers=0, 
                                             collate_fn=SU.collate_fn)
@@ -121,7 +121,7 @@ def get_data(
                                            shuffle=False, num_workers=0, 
                                            collate_fn=SU.collate_fn)
         
-    elif hyperparams['type'] == 'classification':      
+    elif hyperparams['model'] == 'classification':      
         train = torch.utils.data.DataLoader(dataset, batch_size=hyperparams['batch_size'], 
                                             shuffle=True, num_workers=0)
 

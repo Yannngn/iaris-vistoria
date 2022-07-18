@@ -1,6 +1,6 @@
 use_comet: False
 api_key: 7UnASfYEEYgTW4nxdFN6dDhV4
-type: classification
+model: classification
 device: gpu
 
 data: dataset_super_veiculos.csv
