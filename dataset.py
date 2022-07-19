@@ -7,7 +7,7 @@ import torch
 import torchvision
 
 from PIL import Image
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List
 
 from scripts import utils as SU
 
@@ -77,8 +77,8 @@ def get_images_from_drive(
         shutil.copy(full_name, output)
 
 def get_data(
-        images: list, 
-        labels: list, 
+        train_data: Tuple(List, List), 
+        test_data: Optional[Tuple(List, List)], 
         train_transform: torchvision.transforms, 
         test_transform: torchvision.transforms, 
         hyperparams: dict
@@ -97,20 +97,26 @@ def get_data(
         Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]: train and test dataloaders.
     
     '''
-    
+    train_images, train_labels = train_data
+    if test_data is None:
+        test_images, test_labels = train_data
+    else:
+        test_images, test_labels = test_data    
+        
     if hyperparams['model'] == 'detection':
-        dataset = DetectionDataset(images, labels, train_transform)
-        dataset_test = DetectionDataset(images, labels, test_transform)
+        dataset = DetectionDataset(train_images, train_labels, train_transform)
+        dataset_test = DetectionDataset(test_images, test_labels, test_transform)
     
     elif hyperparams['model'] == 'classification':
-        dataset = ClassificationDataset(images, labels, train_transform)
-        dataset_test = ClassificationDataset(images, labels, test_transform)
-
-    indices = torch.randperm(len(dataset)).tolist()
-    length = int(.7 * len(dataset))
+        dataset = ClassificationDataset(train_images, train_labels, train_transform)
+        dataset_test = ClassificationDataset(test_images, test_labels, test_transform)
     
-    dataset = torch.utils.data.Subset(dataset, indices[:length])
-    dataset_test = torch.utils.data.Subset(dataset_test, indices[length:])
+    if test_data is None:
+        indices = torch.randperm(len(dataset)).tolist()
+        length = int(.7 * len(dataset))
+        
+        dataset = torch.utils.data.Subset(dataset, indices[:length])
+        dataset_test = torch.utils.data.Subset(dataset_test, indices[length:])
     
     if hyperparams['model'] == 'detection':
         train = torch.utils.data.DataLoader(dataset, batch_size=hyperparams['batch_size'], 

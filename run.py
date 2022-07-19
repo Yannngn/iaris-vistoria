@@ -37,9 +37,16 @@ if __name__ == '__main__':
         hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
         hyperparams['time'] = now
 
-        images, masks = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['data']), None, hyperparams)
-            
-        train_detector(images, masks, hyperparams)
+
+        images, masks = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['train_data']), None, hyperparams)
+        train_data = (images, masks)
+        test_data = None
+        
+        if hyperparams['test_data']:
+            images, masks = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['test_data']), None, hyperparams)
+            test_data = (images, masks)
+           
+        train_detector(train_data, test_data, hyperparams)
 
     elif hparams.model == 'classification':
         with open('classifier_config.yaml') as f:
@@ -48,7 +55,13 @@ if __name__ == '__main__':
         hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
         hyperparams['time'] = now
 
-        images, labels = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['data']), None, hyperparams)
+        images, masks = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['train_data']), None, hyperparams)
+        train_data = (images, masks)
+        test_data = None
         
-        train_classifier(images, labels, hyperparams)
+        if hyperparams['test_data']:
+            images, masks = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['test_data']), None, hyperparams)
+            test_data = (images, masks)
+           
+        train_classifier(train_data, test_data, hyperparams)
 

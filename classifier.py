@@ -5,15 +5,15 @@ import torch
 import torchvision
 
 from tqdm import tqdm
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 from dataset import get_data
 from utils import get_model_instance_classification, get_criterion, get_optimizer, get_scheduler, get_metrics
 from metrics import evaluate_classification
 
 def train_classifier(
-        images: list, 
-        masks: list, 
+        train_data: Tuple(List, List), 
+        test_data: Tuple(List, List), 
         hyperparams: dict, 
         comet: bool = True) -> None:
     
@@ -33,7 +33,7 @@ def train_classifier(
     model, train_transform, test_transform = get_model_instance_classification(hyperparams)
     model.to(device)
     
-    dataloader_train, dataloader_test = get_data(images, masks, train_transform, test_transform, hyperparams)
+    dataloader_train, dataloader_test = get_data(train_data, test_data, train_transform, test_transform, hyperparams)
     
     loss_criterion = get_criterion(hyperparams)
     optimizer = get_optimizer(model.parameters(), hyperparams)

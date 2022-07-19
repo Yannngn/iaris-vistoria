@@ -8,7 +8,7 @@ from scripts.engine import train_one_epoch, evaluate
 from dataset import get_data
 from utils import get_model_instance_detection, get_optimizer, get_scheduler
 
-def train_detector(images, masks, hyperparams, comet=True):
+def train_detector(train_data, test_data, hyperparams, comet=True):
     device = torch.device('cpu')
     if hyperparams['device'] == 'gpu':
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -16,7 +16,7 @@ def train_detector(images, masks, hyperparams, comet=True):
     model, train_transform, test_transform = get_model_instance_detection(hyperparams)
     model.to(device)
     
-    dataloader_train, dataloader_test = get_data(images, masks, train_transform, test_transform, hyperparams)
+    dataloader_train, dataloader_test = get_data(train_data, test_data, train_transform, test_transform, hyperparams)
     
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = get_optimizer(params, hyperparams)
