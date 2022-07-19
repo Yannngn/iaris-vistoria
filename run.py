@@ -15,7 +15,8 @@ class Args:
 
         parser.add_argument('--model', '-m', type=str, help="detection or classification")
         parser.add_argument('--target', '-t', type=str, help="farol, parabrisa, etc")
-        parser.add_argument('--in_path', '-i', type=str, help="path to csv")
+        parser.add_argument('--train_data', '-a', type=str, help="path to train data csv")
+        parser.add_argument('--test_data', '-e', type=str, default=None, help="path to test data csv")
         
         return parser
 
@@ -33,7 +34,9 @@ if __name__ == '__main__':
         with open(os.path.join(abs_path, 'detector_config.yaml')) as f:
             hyperparams = yaml.safe_load(f)
             hyperparams['target'] = hparams.target
-            hyperparams['data'] = hparams.in_path
+            hyperparams['train_data'] = hparams.train_data
+            hyperparams['test_data'] = hparams.test_data
+            
         hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
         hyperparams['time'] = now
 

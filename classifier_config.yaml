@@ -3,7 +3,8 @@ api_key: 7UnASfYEEYgTW4nxdFN6dDhV4
 model: classification
 device: gpu
 
-data: dataset_super_veiculos.csv
+train_data: dataset_super_veiculos.csv
+test_data: None
 image_column: ref_image
 target: cor
 image_size: 512

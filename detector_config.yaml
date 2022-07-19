@@ -3,7 +3,8 @@ api_key: 7UnASfYEEYgTW4nxdFN6dDhV4
 model: detection
 device: gpu
 
-data: dataset_itens_obrigatorios.csv
+train_data: dataset_itens_obrigatorios.csv
+test_data: None
 image_column: ref_image
 target: farol
 image_size: 320
