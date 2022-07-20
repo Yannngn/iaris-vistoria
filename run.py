@@ -5,8 +5,6 @@ from datetime import datetime
 from argparse import ArgumentParser
 
 from dataset import get_images_and_labels_from_df
-from detector import train_detector
-from classifier import train_classifier
 
 class Args:  
     @staticmethod
@@ -31,6 +29,7 @@ if __name__ == '__main__':
     now = datetime.now().strftime("%Y%m%d-%H%M%S")
 
     if hparams.model == 'detection':
+        from detector import train_detector
         with open(os.path.join(abs_path, 'detector_config.yaml')) as f:
             hyperparams = yaml.safe_load(f)
             hyperparams['target'] = hparams.target
@@ -52,8 +51,12 @@ if __name__ == '__main__':
         train_detector(train_data, test_data, hyperparams)
 
     elif hparams.model == 'classification':
+        from classifier import train_classifier
         with open('classifier_config.yaml') as f:
             hyperparams = yaml.safe_load(f)
+            hyperparams['target'] = hparams.target
+            hyperparams['train_data'] = hparams.train_data
+            hyperparams['test_data'] = hparams.test_data
             
         hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
         hyperparams['time'] = now

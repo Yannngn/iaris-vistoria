@@ -12,8 +12,8 @@ from utils import get_model_instance_classification, get_criterion, get_optimize
 from metrics import evaluate_classification
 
 def train_classifier(
-        train_data: Tuple(List, List), 
-        test_data: Tuple(List, List), 
+        train_data: Tuple[List, List], 
+        test_data: Tuple[List, List], 
         hyperparams: dict, 
         comet: bool = True) -> None:
     
@@ -105,8 +105,8 @@ def comet_train_loop(
         hyperparams (dict): parameters dict
     """   
 
-    comet_ml.init(api_key=hyperparams['comet_api_key'])
-    experiment = comet_ml.Experiment(api_key=hyperparams['comet_api_key'], project_name=hyperparams['comet_project_name'])
+    comet_ml.init(api_key=hyperparams['api_key'])
+    experiment = comet_ml.Experiment(api_key=hyperparams['api_key'], project_name=hyperparams['project_name'])
     experiment.log_parameters(hyperparams)   
     callback_cm = confusion_matrix_comet(model, dataloader_val, experiment, hyperparams, device)
     global_metrics, label_metrics = get_metrics(hyperparams)

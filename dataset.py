@@ -77,8 +77,8 @@ def get_images_from_drive(
         shutil.copy(full_name, output)
 
 def get_data(
-        train_data: Tuple(List, List), 
-        test_data: Optional[Tuple(List, List)], 
+        train_data: Tuple[List, List], 
+        test_data: Optional[Tuple[List, List]], 
         train_transform: torchvision.transforms, 
         test_transform: torchvision.transforms, 
         hyperparams: dict
