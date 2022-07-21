@@ -46,10 +46,14 @@ def train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, d
 
 def comet_train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams):
     comet_ml.init()
-    experiment = comet_ml.Experiment(api_key=hyperparams['comet_api_key'], project_name=hyperparams['comet_project_name'])
+    experiment = comet_ml.Experiment(api_key=hyperparams['api_key'], project_name=hyperparams['project_name'])
     experiment.log_parameters(hyperparams)
     
     for epoch in range(hyperparams['num_epochs']):
+        experiment.set_epoch(epoch)
+        experiment.set_step(epoch)
+        print(f'Starting training epoch {epoch}:') 
+        
         with experiment.train():
             metric_logger = train(model, optimizer, scheduler, dataloader_train, device, epoch, hyperparams)
             print(metric_logger)

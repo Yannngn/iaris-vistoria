@@ -12,11 +12,24 @@ class Args:
         parser = ArgumentParser(parents=[parent_parser])
 
         parser.add_argument('--model', '-m', type=str, help="detection or classification")
-        parser.add_argument('--target', '-t', type=str, help="farol, parabrisa, etc")
-        parser.add_argument('--train_data', '-a', type=str, help="path to train data csv")
+        parser.add_argument('--target', '-t', type=str, default=None, help="farol, parabrisa, etc")
+        parser.add_argument('--train_data', '-a', type=str, default=None, help="path to train data csv")
         parser.add_argument('--test_data', '-e', type=str, default=None, help="path to test data csv")
         
         return parser
+
+def load_config(config_path):
+    with open(config_path) as f:
+        hyperparams = yaml.safe_load(f)
+    
+    if hparams.target: hyperparams['target'] = hparams.target
+    if hparams.train_data: hyperparams['train_data'] = hparams.train_data
+    if hparams.test_data: hyperparams['test_data'] = hparams.test_data
+
+    hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
+    hyperparams['time'] = now
+    
+    return hyperparams
 
 if __name__ == '__main__':
     parent_parser = ArgumentParser(add_help=False)
@@ -30,15 +43,9 @@ if __name__ == '__main__':
 
     if hparams.model == 'detection':
         from detector import train_detector
-        with open(os.path.join(abs_path, 'detector_config.yaml')) as f:
-            hyperparams = yaml.safe_load(f)
-            hyperparams['target'] = hparams.target
-            hyperparams['train_data'] = hparams.train_data
-            hyperparams['test_data'] = hparams.test_data
-            
-        hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
-        hyperparams['time'] = now
+        config_path = os.path.join(abs_path, 'detector_config.yaml')
 
+        hyperparams = load_config(config_path)
 
         images, masks = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['train_data']), None, hyperparams)
         train_data = (images, masks)
@@ -52,14 +59,8 @@ if __name__ == '__main__':
 
     elif hparams.model == 'classification':
         from classifier import train_classifier
-        with open('classifier_config.yaml') as f:
-            hyperparams = yaml.safe_load(f)
-            hyperparams['target'] = hparams.target
-            hyperparams['train_data'] = hparams.train_data
-            hyperparams['test_data'] = hparams.test_data
-            
-        hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
-        hyperparams['time'] = now
+        config_path = os.path.join(abs_path, 'classifier_config.yaml')
+        hyperparams = load_config(config_path)
 
         images, masks = get_images_and_labels_from_df(os.path.join(abs_path, hyperparams['train_data']), None, hyperparams)
         train_data = (images, masks)

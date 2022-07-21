@@ -13,9 +13,9 @@ from metrics import evaluate_classification
 
 def train_classifier(
         train_data: Tuple[List, List], 
-        test_data: Tuple[List, List], 
-        hyperparams: dict, 
-        comet: bool = True) -> None:
+        test_data: Optional[Tuple[List, List]], 
+        hyperparams: dict
+        ) -> None:
     
     """_summary_
 
@@ -39,7 +39,7 @@ def train_classifier(
     optimizer = get_optimizer(model.parameters(), hyperparams)
     scheduler = get_scheduler(optimizer, hyperparams)
         
-    if comet:
+    if hyperparams['comet']:
         comet_train_loop(model, loss_criterion, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams)
     else:
         train_loop(model, loss_criterion, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams)
@@ -119,8 +119,8 @@ def comet_train_loop(
         train_loss, train_accuracy = train(model, loss_criterion, optimizer, dataloader_train, device)
         with experiment.train():
             experiment.log_metrics({"accuracy": train_accuracy, "loss": train_loss})        
-        print(f'TRAIN: \t Loss: {train_loss}; Accuracy: {train_accuracy}')
-        print()
+        
+        print(f'TRAIN: \t Loss: {train_loss}; Accuracy: {train_accuracy} \n')
         
         if epoch % hyperparams['validation_interval'] == 0 or epoch == hyperparams['num_epochs'] - 1:
             print(f'Validating and logging epoch {epoch}:')
@@ -137,11 +137,12 @@ def comet_train_loop(
 
             metrics['accuracy'] = val_accuracy
             metrics['loss'] = val_loss
+            metrics['learning_rate'] = scheduler.get_last_lr()
             experiment.log_metrics(metrics)
         
         callback_cm.on_epoch_end(epoch, hyperparams, device)
         
-        print(f'VALIDATION: \t Loss: {val_loss}; Accuracy: {val_accuracy}')            
+        print(f'VALIDATION: \t Loss: {val_loss}; Accuracy: {val_accuracy} \n')            
         
         if epoch % hyperparams['checkpoint_interval'] == 0 or epoch == hyperparams['num_epochs'] - 1:
             torch.save(model.state_dict(), os.path.join(os.path.dirname(os.path.abspath(__file__)), f'models/{hyperparams["time"]}_{hyperparams["target"]}.pickle'))
