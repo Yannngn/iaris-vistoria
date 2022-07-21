@@ -12,8 +12,9 @@ class Args:
         parser = ArgumentParser(parents=[parent_parser])
 
         parser.add_argument('--model', '-m', type=str, help="detection or classification")
+        parser.add_argument('--name', '-n',  type=str, default='model')#, help="detection or classification")
         parser.add_argument('--target', '-t', type=str, default=None, help="farol, parabrisa, etc")
-        parser.add_argument('--train_data', '-a', type=str, default=None, help="path to train data csv")
+        parser.add_argument('--train_data', '-a', type=str, help="path to train data csv")
         parser.add_argument('--test_data', '-e', type=str, default=None, help="path to test data csv")
         
         return parser
@@ -25,8 +26,9 @@ def load_config(config_path):
     if hparams.target: hyperparams['target'] = hparams.target
     if hparams.train_data: hyperparams['train_data'] = hparams.train_data
     if hparams.test_data: hyperparams['test_data'] = hparams.test_data
+    if hparams.name: hyperparams['name'] = hparams.name
 
-    hyperparams['project_name'] = f"model_{hyperparams['model']}_{hyperparams['target']}"
+    hyperparams['project_name'] = f"{hyperparams['name']}_{hyperparams['model']}_{hyperparams['target']}"
     hyperparams['time'] = now
     
     return hyperparams

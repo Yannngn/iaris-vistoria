@@ -37,14 +37,14 @@ def get_images_and_labels_from_df(
              
     if params['model'] == 'classification':
         labels = df[params['target']].values.tolist()
-        params['labels'] = list(set(df[f'{params["target"]}_label']))
+        params['labels'] = df[f"{params['target']}_label"].unique().tolist()
         params['num_classes'] = len(params['labels'])
-        for i, v in enumerate(params['labels']):
-            labels = [l if l != v else i for l in labels]
+        # for i, v in enumerate(params['labels']):
+        #     labels = [l if l != v else i for l in labels]
 
-            tup = [(a,b) for a,b  in zip(images, labels) if b]
-            images = [a for a, _ in tup]
-            labels = [b for _, b in tup]
+        #     tup = [(a,b) for a,b  in zip(images, labels) if b]
+        #     images = [a for a, _ in tup]
+        #     labels = [b for _, b in tup]
 
     elif params['model'] == 'detection':
         labels = df[f"{params['target']}_masks"].values.tolist()
