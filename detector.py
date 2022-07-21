@@ -42,7 +42,7 @@ def train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, d
             validate(model, dataloader_test, device)
         
         if epoch % hyperparams['checkpoint_interval'] == 0:
-            torch.save(model.state_dict(), f'models/{hyperparams["time"]}_{hyperparams["target"]}.pickle')
+            torch.save(model.state_dict(), f'models/{hyperparams["time"]}_{hyperparams["project_name"]}.pickle')
 
 def comet_train_loop(model, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams):
     comet_ml.init()
@@ -62,7 +62,7 @@ def comet_train_loop(model, optimizer, scheduler, dataloader_train, dataloader_t
             validate(model, dataloader_test, device)
                 
         if epoch % hyperparams['checkpoint_interval'] == 0:
-            torch.save(model.state_dict(), f'models/{hyperparams["time"]}_{hyperparams["target"]}.pickle')
+            torch.save(model.state_dict(), f'models/{hyperparams["time"]}_{hyperparams["project_name"]}.pickle')
         
     experiment.end()
     

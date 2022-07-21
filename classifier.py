@@ -44,7 +44,7 @@ def train_classifier(
     else:
         train_loop(model, loss_criterion, optimizer, scheduler, dataloader_train, dataloader_test, device, hyperparams)
     
-    torch.save(model.state_dict(), f'models/{hyperparams["time"]}_{hyperparams["target"]}.pickle')
+    torch.save(model.state_dict(), f'models/{hyperparams["time"]}_{hyperparams["project_name"]}.pickle')
 
 def train_loop(
         model, 
@@ -145,7 +145,7 @@ def comet_train_loop(
         print(f'VALIDATION: \t Loss: {val_loss}; Accuracy: {val_accuracy} \n')            
         
         if epoch % hyperparams['checkpoint_interval'] == 0 or epoch == hyperparams['num_epochs'] - 1:
-            torch.save(model.state_dict(), os.path.join(os.path.dirname(os.path.abspath(__file__)), f'models/{hyperparams["time"]}_{hyperparams["target"]}.pickle'))
+            torch.save(model.state_dict(), os.path.join(os.path.dirname(os.path.abspath(__file__)), f'models/{hyperparams["time"]}_{hyperparams["project_name"]}.pickle'))
             
         experiment.log_epoch_end(epoch)   
         
