@@ -30,7 +30,8 @@ def get_scheduler(optimizer, hyperparams):
     else: pass
     
 def get_model_instance_classification(hyperparams):
-    model = torchvision.models.alexnet(pretrained=True)
+    model = torchvision.models.alexnet(weights=torchvision.models.AlexNet_Weights.DEFAULT)
+     
     model.classifier[2] = nn.Linear(4096, hyperparams['layer_2_size'])
     model.classifier[4] = nn.Linear(hyperparams['layer_2_size'], hyperparams['layer_4_size'])
     model.classifier[6] = nn.Linear(hyperparams['layer_4_size'], hyperparams['num_classes'])
