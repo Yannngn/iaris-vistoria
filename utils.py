@@ -4,7 +4,7 @@ import torchvision
 
 from torch import nn
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
+from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor, MaskRCNN_ResNet50_FPN_Weights
 
 from scripts import transforms as T
 
@@ -62,7 +62,7 @@ def get_model_instance_detection(hyperparams):
             transforms.append(T.RandomHorizontalFlip(0.5))
         return T.Compose(transforms)
  
-    model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)
+    model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights=MaskRCNN_ResNet50_FPN_Weights.DEFAULT)
     
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, hyperparams['num_classes'])
