@@ -132,8 +132,7 @@ def comet_train_loop(
             metrics = None
         
         with experiment.validate():
-            if not metrics:
-                metrics = {}  
+            if not metrics: metrics = {}  
 
             metrics['accuracy'] = val_accuracy
             metrics['loss'] = val_loss
