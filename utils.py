@@ -27,6 +27,7 @@ def get_scheduler(optimizer, hyperparams):
     if hyperparams['scheduler'] == 'step': return torch.optim.lr_scheduler.StepLR(optimizer, step_size=hyperparams['scheduler_step'], gamma=0.1)
     elif hyperparams['scheduler'] == 'plateau': return torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', step_size=hyperparams['scheduler_step'])
     elif hyperparams['scheduler'] == 'cyclic': return torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=hyperparams['learning_rate'] * 0.1, max_lr=hyperparams['learning_rate'], step_size_up=hyperparams['scheduler_step'], verbose=True)
+    elif hyperparams['scheduler'] == 'cosine': return torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=hyperparams['num_epochs'])
     else: pass
     
 def get_model_instance_classification(hyperparams):
@@ -112,6 +113,41 @@ def get_metrics(config):
     label_dict = dict(zip(label_metrics_names, label_metrics))
 
     return global_dict, label_dict
+
+@torch.jit.script
+def mask_iou(
+    mask1: torch.Tensor,
+    mask2: torch.Tensor,
+) -> torch.Tensor:
+
+    """
+    Inputs:
+    mask1: NxHxW torch.float32. Consists of [0, 1]
+    mask2: NxHxW torch.float32. Consists of [0, 1]
+    Outputs:
+    ret: NxM torch.float32. Consists of [0 - 1]
+    """
+
+    N, H, W = mask1.shape
+    M, H, W = mask2.shape
+
+    mask1 = mask1.view(N, H*W)
+    mask2 = mask2.view(M, H*W)
+
+    intersection = torch.matmul(mask1, mask2.t())
+
+    area1 = mask1.sum(dim=1).view(1, -1)
+    area2 = mask2.sum(dim=1).view(1, -1)
+
+    union = (area1.t() + area2) - intersection
+
+    ret = torch.where(
+        union == 0,
+        torch.tensor(0., device=mask1.device),
+        intersection / union,
+    )
+
+    return ret
 
 class ConfusionMatrixCallbackReuseImages():
     def __init__(self, model, experiment, inputs, targets, confusion_matrix):

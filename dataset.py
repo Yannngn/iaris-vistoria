@@ -164,6 +164,9 @@ class DetectionDataset(Dataset):
     def __getitem__(self, idx):
         img_path = self.images[idx]
         mask_path = self.labels[idx]
+        
+        car_id = img_path.split('/')[-1].split('.')[0]       
+
         img = Image.open(img_path).convert("RGB")
         img = img.resize((512, 512))
 
@@ -195,6 +198,7 @@ class DetectionDataset(Dataset):
                   "labels": labels,
                   "masks": masks,
                   "image_id": image_id,
+                  "car_id": car_id,
                   "area": area,
                   "iscrowd": iscrowd}
         
